@@ -60,9 +60,9 @@
                         </div>
                 </div>
 		<script>
-                        $("button").submit(function(event){
-                                var token = document.getElementById("token");
-                                var pastdays = document.getElementById("pastdays");
+                        $("button").click(function(event){
+                                var token = document.getElementById("token").value;
+                                var pastdays = document.getElementById("pastdays").value;
                                 console.log(token + ", " + pastdays);
                         });
                 </script>
