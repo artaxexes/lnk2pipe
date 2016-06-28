@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt">
+        <head>
+                <title></title>
+                <meta charset="utf-8">
+                <meta name="description" content="Automating Pipedrive data download as CSV file">
+                <meta name="keywords" content="pipedrive, automating, download, csv">
+                <meta name="author" content="Artaxexes J. Ferreira">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+                <!-- bootstrap -->
+                <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+                <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+                <!-- angularjs -->
+                <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+                <!-- internal style -->
+                <style>
+                        div {
+                                text-align: center
+                        }
+                </style>
+        </head>
+        <body>
+                <div class="container">
+                        <div class="jumbotron">
+                                <h1>pipedown</h1>
+                                <p>Automatização do download de dados do <a href="http://www.pipedrive.com" target="_blank">Pipedrive</a> em formato <a href="https://tools.ietf.org/html/rfc4180" target="_blank">CSV</a></p>
+                        </div>
+                        <div class="row">
+                                <div class="col-md-12">
+                                        <div class="form-group">
+                                                <label for"token">Token:</label>
+                                                <input type="text" class="form-control" id="token" size="40" value="d95827202d8328ef54fc2612d67feda0351c303f">
+                                                <span class="help-block">Seu token de API pessoal que pode ser encontrado em Ajustes > Pessoal > API no site do Pipedrive</span>
+                                        </div>
+                                        <div class="form-group">
+                                                <label for="pastdays">Atualizações realizadas nos últimos:</label>
+                                                <select class="form-control" id="pastdays">
+                                                                <option value="5">5 dias</option>
+                                                                <option value="10">10 dias</option>
+                                                                <option value="15">15 dias</option>
+                                                                <option value="20">20 dias</option>
+                                                                <option value="25">25 dias</option>
+                                                                <option value="30">30 dias</option>
+                                                                <option value="35">35 dias</option>
+                                                                <option value="40" selected>40 dias</option>
+                                                                <option value="45">45 dias</option>
+                                                                <option value="50">50 dias</option>
+                                                </select>
+                                                <br>
+                                                <button type="submit" class="btn btn-default">Download</button>
+						</div>
+                                        <div class="panel-footer">
+                                                <p>
+                                                        Problemas? <a href="mailto:anddrei.ferreira@biggdata.com.br?Subject=pipedown" target="_top">anddrei.ferreira@biggdata.com.br</a>
+                                                </p>
+                                        </div>
+                                </div>
+                        </div>
+                </div>
+        </body>
+</html>
