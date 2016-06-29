@@ -81,13 +81,13 @@
 						if(resultLength > 0){
 							var lines = 0;
 							var csv = "data:text/csv;charset=utf-8,";
-							csv += "Atualização,Organização,Observação;";
+							csv += "Atualizacao, Organizacao, Observacao\n";
 							for(var i = 0; i < resultLength; i++){
 								var record = result.data[i];
 								var recordDate = new Date(record.update_time);
 								if(recordDate >= pastDate){
 									console.log(recordDate + ", " + record.org_name + ", " + record.next_activity_node + ";");
-									csv += recordDate + "," + record.org_name + "," + record.next_activity_node + ";";
+									csv += recordDate + ", " + record.org_name + ", " + record.next_activity_node + "\n";
 									lines++;
 								}
 							}
