@@ -75,7 +75,6 @@
 					var pastDate = new Date();
 					var monthDay = pastDate.getDate();
 					pastDate.setDate(monthDay - pastDays);
-					console.log("Past date: " + pastDate);
 					$.getJSON(url, function(result){
 						var resultLength = result.data.length;
 						if(resultLength > 0){
@@ -86,7 +85,6 @@
 								var record = result.data[i];
 								var recordDate = new Date(record.update_time);
 								if(recordDate >= pastDate){
-									console.log(recordDate + ", " + record.org_name + ", " + record.next_activity_node + ";");
 									csv += recordDate + ", " + record.org_name + ", \"" + record.next_activity_node + "\";\n";
 									lines++;
 								}
@@ -100,10 +98,10 @@
                                                         	link.click();
                                                         	document.body.removeChild(link);
                                                 	} else {
-                                                        	prompt("Nao existem atualizações após " + pastDate);
+								prompt("Não existem atualizações após " + pastDate);
                                                 	}
                                         	} else {
-                                                	prompt("Nao existem deals");
+							prompt("Não existem deals");
 						}
 					});
 				}
