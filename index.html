@@ -87,7 +87,7 @@
 								var recordDate = new Date(record.update_time);
 								if(recordDate >= pastDate){
 									console.log(recordDate + ", " + record.org_name + ", " + record.next_activity_node + ";");
-									csv += recordDate + ", " + record.org_name + ", " + record.next_activity_node + "\n";
+									csv += recordDate + ", " + record.org_name + ", \"" + record.next_activity_node + "\"\n";
 									lines++;
 								}
 							}
