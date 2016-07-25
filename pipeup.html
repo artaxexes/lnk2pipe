@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt">
         <head>
-                <title></title>
+                <title>lnk2pipe - pipedown</title>
                 <meta charset="utf-8">
                 <meta name="description" content="Automating Pipedrive data download as CSV file">
                 <meta name="keywords" content="pipedrive, automating, download, csv">
@@ -24,36 +24,13 @@
         <body>
                 <div class="container">
                         <div class="jumbotron">
-                                <h1>pipedown</h1>
-                                <p>Automatização do download de dados do <a href="http://www.pipedrive.com" target="_blank">Pipedrive</a> em formato <a href="https://tools.ietf.org/html/rfc4180" target="_blank">CSV</a></p>
+                                <a href="index.html"><h1>lnk2pipe</h1></a>
+				<p>Interação (um pouco) automatizada com <a href="http://www.pipedrive.com" target="_blank">Pipedrive</a></p>
                         </div>
                         <div class="row">
                                 <div class="col-md-12">
-                                        <div class="form-group">
-                                                <label for"token">Token:</label>
-                                                <input type="text" class="form-control" id="token" size="40" value="Your personal API token goes here">
-                                                <span class="help-block">Seu token de API pessoal que pode ser encontrado em Ajustes > Pessoal > API no site do Pipedrive</span>
-                                        </div>
-                                        <div class="form-group">
-                                                <label for="pastdays">Atualizações realizadas nos últimos:</label>
-                                                <select class="form-control" id="pastdays">
-                                                                <option value="5">5 dias</option>
-                                                                <option value="10">10 dias</option>
-                                                                <option value="15">15 dias</option>
-                                                                <option value="20">20 dias</option>
-                                                                <option value="25">25 dias</option>
-                                                                <option value="30">30 dias</option>
-                                                                <option value="35">35 dias</option>
-                                                                <option value="40" selected>40 dias</option>
-                                                                <option value="45">45 dias</option>
-                                                                <option value="50">50 dias</option>
-                                                </select>
-                                                <br>
-                                                <button type="submit" class="btn btn-default">Download</button>
-					</div>
-					<div hidden class="alert alert-warning" id="invalidtoken">
-						<!-- <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> -->
-						<strong>Atenção!</strong> Token inválido!
+                                        <div>
+						<p>pipeup</p>
 					</div>
                                         <div class="panel-footer">
                                                 <p>
@@ -71,43 +48,8 @@
 				} else {
 					$("#invalidtoken").hide(700);
 					var url = "https://api.pipedrive.com/v1/deals?api_token=" + token;
-					var pastDays = document.getElementById("pastdays").value;
-					var now = new Date();
-					var pastDate = now;
-					var monthDay = pastDate.getDate();
-					pastDate.setDate(monthDay - pastDays);
-					$.getJSON(url, function(result){
-						var resultLength = result.data.length;
-						if(resultLength > 0){
-							var lines = 0;
-							var csv = "data:text/csv;charset=utf-8,";
-							csv += "Atualizacao, Empresa ID, Empresa, Nota;\n";
-							for(var i = 0; i < resultLength; i++){
-								var record = result.data[i];
-								var recordDate = new Date(record.update_time);
-								if(recordDate >= pastDate){
-									csv += recordDate + ", " + record.org_id.value + ", " + record.org_id.name + ", \"" + record.next_activity_node + "\";\n";
-									lines++;
-								}
-							}
-							if(lines > 0){
-								var encodedURI = encodeURI(csv);
-                                                        	var link = document.createElement("a");
-                                                        	link.setAttribute("href", encodedURI);
-								link.setAttribute("download", now.toISOString() + ".csv");
-                                                        	document.body.appendChild(link);
-                                                        	link.click();
-                                                        	document.body.removeChild(link);
-                                                	} else {
-								prompt("Não existem atualizações após " + pastDate);
-                                                	}
-                                        	} else {
-							prompt("Não existem deals");
-						}
-					});
 				}
 			});
                 </script>
-
         </body>
 </html>
