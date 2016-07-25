@@ -1,2 +1,2 @@
-# pipedown
-Automating Pipedrive data download as CSV file
+# lnk2pipe
+Small automation in the Pipedrive interaction
