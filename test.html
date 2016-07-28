@@ -1,0 +1,66 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<p id="demo">
+		</p>
+		<script>
+			
+			var target = "deals";
+			var token = "";
+			var start = 0;
+			var limit = 500;
+			var url = "https://api.pipedrive.com/v1/" + target + "?api_token=" + token + "&start=" + start + "&limit=" + limit;
+			var req1 = new XMLHttpRequest();
+			req1.onreadystatechange = function(){
+				if(req1.readyState == 4 && req1.status == 200){
+					var res1 = JSON.parse(req1.responseText);
+					var length = res1["data"].length;
+					var ids = [];
+					for(var i = 0; i < length; i++){
+						if(res1["data"][i]["last_activity_id"] !== null){
+							ids.push(res1["data"][i]["id"]);
+						}
+					}
+					alert(ids.length + "/" + length + " ids");
+					length = ids.length;
+					var reqs = [];
+					for(var j = 0; j < length; j++){
+						url = "https://api.pipedrive.com/v1/" + target + ":(expected_close_date,86c36896097d77ad77dbb52337a13f9799c72c16,1a0f93c059a93450fdb4b8d0bb26613fe0d6460,products_count,org_id,deal_title,last_activity,6b7027058f7b5ec5c9f6fd822a34a86adb8cc726)/" + ids[j] + "?api_token=" + token;
+						reqs[j] = new XMLHttpRequest();
+						var req = reqs[j];
+						req.onreadystatechange = function(){
+							if(req.readyState == 4 && req.status == 200){
+								var rec = JSON.parse(req.responseText);
+								document.getElementById("demo").innerHTML = req.responseText;
+							}
+						}
+						req.open("GET", url, true);
+						req.send();
+					}
+				}
+			};
+			req1.open("GET", url, true);
+			req1.send();
+
+			var csv = "data:text/csv;charset=utf-8,";
+            csv += "Fechamento,Competidor,Status,Produtos,Empresa,Oportunidade,Tipo,Adicionada,Feito,Em,Evento,Descricao\r\n";
+
+			function callback(rec){
+            	csv += rec["data"]["expected_close_date"] + ",\"";
+               	csv += rec["data"]["86c36896097d77ad77dbb52337a13f9799c72c16"] + "\",\"";
+                csv += rec["data"]["1a0f93c059a93450fdb4b8d0bb26613fe0d6460f"] + "\",";
+                csv += rec["data"]["products_count"] + ",\"";
+               	csv += rec["data"]["org_id"]["name"] + "\",\"";
+               	csv += rec["data"]["deal_title"] + "\",";
+               	csv += rec["data"]["last_activity"]["type"] + ",";
+               	csv += rec["data"]["last_activity"]["add_time"] + ",";
+               	csv += rec["data"]["last_activity"]["done"] + ",";
+               	csv += rec["data"]["last_activity"]["marked_as_done_time"] + ",\"";
+               	csv += rec["data"]["6b7027058f7b5ec5c9f6fd822a34a86adb8cc726"] + "\",\"";
+               	csv += rec["data"]["last_activity"]["note"] + "\"\r\n";
+			}
+			alert(csv);
+		</script>
+	</body>
+</html>
