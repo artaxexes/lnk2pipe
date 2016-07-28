@@ -29,7 +29,7 @@
 				<p>Download de dados do <a href="http://www.pipedrive.com" target="_blank">Pipedrive</a> em formato de arquivo <a href="https://tools.ietf.org/html/rfc4180" target="_blank">CSV</a></p>
 				<div class="form-group">
 					<label for="token">Token:</label>
-					<input type="text" class="form-control" id="token" size="40" value="0000000001000000000200000000030000000004" readonly>
+					<input type="text" class="form-control" id="token" size="40" value="" readonly>
 					<span class="help-block">Seu token de API pessoal que pode ser encontrado em Ajustes > Pessoal > API no site do Pipedrive</span>
 					<button type="submit" class="btn btn-default" id="token">Download</button>
 				</div>
@@ -41,52 +41,80 @@
 	</div>
 	<script>
         $("button").click(function(event){
+			var csv = "data:text/csv;charset=utf-8,";
+            csv += "Fechamento,Competidor,Status,Produtos,Empresa,Oportunidade,Tipo,Adicionada,Feito,Em,Evento,Descricao\r\n";var csv = "";
+            var start = 0;
+			var limit = 500;
             var token = document.getElementById("token").value;
-            var url = "https://api.pipedrive.com/v1/deals?api_token=" + token + "&start=0&limit=500";
-            $.getJSON(url, function(res){
-                if(res.data.length > 0){
-					alert("primeiro getJSON");
-					var ids = [];
-					for(var i = 0; i < res.data.length; i++){
-						if(res.data[i].last_activity_id !== null){
-							ids.push(res.data[i].id);
+            var url = "https://api.pipedrive.com/v1/deals?api_token=" + token + "&start=" + start + "&limit=" + limit;
+			$.ajax({url: url,
+					dataType: 'json',
+					async: false,
+					success: function(data){
+						getIds(data);
+					} 	
+			});
+			function getIds(data){
+				console.log("I am in getIds");
+				var leng = data["data"].length;
+				var ids = [];
+				if(leng > 0){
+					var callFunc = false;
+					for(var i = 0; i < leng; i++){
+						if(data["data"][i]["last_activity_id"] !== null){
+							callFunc = true;
+							ids.push(data["data"][i]["id"]);
 						}
 					}
-					alert(ids.length);
-                    var csv = "data:text/csv;charset=utf-8,";
-                    csv += "Fechamento,Competidor,Status,Produtos,Empresa,Oportunidade,Tipo,Adicionada,Feito,Em,Evento,Descricao\r\n";
-					for(var j = 0; j < ids.length; j++){
-						alert(j);
-            			// URL requests: org name, title, expected close date, "competidor", "status", products count, next activity subject and note and "evento"
-						url = "https://api.pipedrive.com/v1/deals:(expected_close_date,86c36896097d77ad77dbb52337a13f9799c72c16,1a0f93c059a93450fdb4b8d0bb26613fe0d6460,products_count,org_id,deal_title,last_activity,6b7027058f7b5ec5c9f6fd822a34a86adb8cc726)/" + ids[j] + "?api_token=" + token;
-                       	$.getJSON(url, function(dt){
-							var rec = dt.data;
-                       		csv += rec["expected_close_date"] + ",\"" +
-							rec["86c36896097d77ad77dbb52337a13f9799c72c16"] + "\",\"" +
-							rec["1a0f93c059a93450fdb4b8d0bb26613fe0d6460f"] + "\"," +
-							rec["products_count"] + ",\"" +
-							rec["org_id"]["name"] + "\",\"" +
-							rec["deal_title"] + "\"," +
-							rec["last_activity"]["type"] + "," +
-							rec["last_activity"]["add_time"] + "," +
-							rec["last_activity"]["done"] + "," +
-							rec["last_activity"]["marked_as_done_time"] + ",\"" +
-							rec["6b7027058f7b5ec5c9f6fd822a34a86adb8cc726"] + "\",\"" +
-							rec["last_activity"]["note"] + "\"\r\n";
-                    	});
+					callFunc ? getLastActivity(ids) : alert("There is no deal with last activity");
+				}
+			}
+            function getLastActivity(ids){
+				console.log("I am in getLastActivity");
+				// URL requests: org name, title, expected close date, "competidor", "status", products count, next activity subject and note and "evento"
+				for(j = 0; j < ids.length; j++){
+					url = "https://api.pipedrive.com/v1/deals:(expected_close_date,86c36896097d77ad77dbb52337a13f9799c72c16,1a0f93c059a93450fdb4b8d0bb26613fe0d6460,products_count,org_id,deal_title,last_activity,6b7027058f7b5ec5c9f6fd822a34a86adb8cc726)/" + ids[j] + "?api_token=" + token;
+					$.ajax({url: url,
+							dataType: 'json',
+							async: false,
+							success: function(data){
+								console.log(j + "/" + ids.length);
+								j == (ids.length - 1) ? mountCSV(data, true) : mountCSV(data, false);
+							}
+					});
+				}
+			}
+			function mountCSV(data, down){
+					console.log("I am mounting CSV");
+					var rec = data["data"];
+                	csv += rec["expected_close_date"] + ",";
+					csv += rec["86c36896097d77ad77dbb52337a13f9799c72c16"] + ",";
+					csv += rec["1a0f93c059a93450fdb4b8d0bb26613fe0d6460f"] + ",";
+					csv += rec["products_count"] + ",";
+					csv += rec["org_id"]["name"] + ",";
+					csv += rec["deal_title"] + ",";
+					csv += rec["last_activity"]["type"] + ",";
+					csv += rec["last_activity"]["add_time"] + ",";
+					csv += rec["last_activity"]["done"] + ",";
+					csv += rec["last_activity"]["marked_as_done_time"] + ",";
+					csv += rec["6b7027058f7b5ec5c9f6fd822a34a86adb8cc726"] + ",";
+					csv += rec["last_activity"]["note"] + "\r\n";
+					if(down){
+						console.log("Let's down the CSV");
+						downCSV(csv);
 					}
-				    var encodedURI = encodeURI(csv);
-					var link = document.createElement('a');
-					link.setAttribute('href', encodedURI);
-					link.setAttribute('download', new Date().toISOString() + ".csv");
-					document.body.appendChild(link);
-					link.click();
-					document.body.removeChild(link);
-				} else {
-					prompt("No deals!");
-                }
-			});
-		});
+			}
+			function downCSV(csv){
+				console.log("I am in downCSV");
+				var encodedURI = encodeURI(csv);
+				var link = document.createElement('a');
+				link.setAttribute('href', encodedURI);
+				link.setAttribute('download', new Date().toISOString() + ".csv");
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+			}
+		});	
 	</script>
 </body>
 </html>
