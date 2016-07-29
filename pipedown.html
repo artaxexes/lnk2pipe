@@ -44,20 +44,26 @@
 			var downNow = false;
 			var csv = "data:text/csv;charset=utf-8,";
             csv += "Fechamento,Competidor,Status,Produtos,Empresa,Oportunidade,Tipo,Adicionada,Feito,Em,Evento,Descricao\r\n";
+            var token = document.getElementById("token").value;
             var start = 0;
 			var limit = 500;
-            var token = document.getElementById("token").value;
             var url = "https://api.pipedrive.com/v1/deals?api_token=" + token + "&start=" + start + "&limit=" + limit;
 			$.ajax({url: url,
 					dataType: 'json',
 					async: false,
+					error: function(err){
+						console.log(err.status + ": " + err.statusText);
+					},
 					success: function(data){
 						getIDs(data);
-					} 	
+					}
 			});
 			function getIDs(data){
 				var length = data["data"].length;
 				var ids = [];
+				if(data["additional_data"]["pagination"]["more_items_in_collection"]){
+					alert("There is more items in collection");
+				}
 				if(length > 0){
 					var lastActivity = false;
 					for(var i = 0; i < length; i += 1){
