@@ -43,7 +43,7 @@
 				<p>Download de dados do <a href="http://www.pipedrive.com" target="_blank">Pipedrive</a> em formato de arquivo <a href="https://tools.ietf.org/html/rfc4180" target="_blank">CSV</a></p>
 				<div class="form-group">
 					<label for="token">Token:</label>
-					<input type="text" class="form-control" id="token" size="40" value="" readonly>
+					<input type="text" class="form-control" id="token" size="40" value="8a5013e6439b784f8bfed1242beca3e73c27faea" readonly>
 					<span class="help-block">Seu token de API pessoal que pode ser encontrado em Ajustes > Pessoal > API no site do Pipedrive</span>
 				</div>
 			</div>
@@ -134,7 +134,13 @@
 					csv += props.join(",") + "\r\n";
 					for(var i = 1; i <= data["data"].length; i += 1){
 						for(var j = 1; j <= props.length; j += 1){
-							csv += (j == props.length) ? data["data"][i-1][props[j-1]] + "\r\n" : data["data"][i-1][props[j-1]] + ",";
+							var tmp = data["data"][i-1][props[j-1]];
+							//var field = "";
+							if(typeof tmp == "string"){
+								tmp = "\"" + tmp.replace(/\"/g, "\\\"") + "\"";
+							}
+							csv += (j == props.length) ? tmp + "\r\n" : tmp + ",";
+							//csv += (j == props.length) ? data["data"][i-1][props[j-1]] + "\r\n" : data["data"][i-1][props[j-1]] + ",";
 						}
 					}
 					downFile(csv, target);
