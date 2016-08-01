@@ -87,88 +87,47 @@
 		</div>
 	</div>
 	<script>
-        $("button").click(function(event){
-			var downNow = false;
-			var csv = "data:text/csv;charset=utf-8,";
-            csv += "Fechamento,Competidor,Status,Produtos,Empresa,Oportunidade,Tipo,Adicionada,Feito,Em,Evento,Descricao\r\n";
-            var token = document.getElementById("token").value;
-            var start = 0;
-			var limit = 500;
-            var url = "https://api.pipedrive.com/v1/deals?api_token=" + token + "&start=" + start + "&limit=" + limit;
+		$("button").click(function(event){
+			var token = document.getElementById("token").value;
+			var target = event.target.id;
+			var url = "https://api.pipedrive.com/v1/" + target + "?api_token=" + token;
 			$.ajax({url: url,
-					dataType: 'json',
-					async: false,
+					dataType: "json",
 					error: function(err){
-						console.log(err.status + ": " + err.statusText);
+						showAlert("<strong>" + err.status + ": " + err.statusText + "</strong>", "danger");
 					},
 					success: function(data){
-						getIDs(data);
+						showAlert("<strong>Wait a second, downloading the data...</strong>", "info");
+						downloadRegs(data, target);
 					}
 			});
-			function getIDs(data){
-				var length = data["data"].length;
-				var ids = [];
-				if(data["additional_data"]["pagination"]["more_items_in_collection"]){
-					alert("There is more items in collection");
-				}
-				if(length > 0){
-					var lastActivity = false;
-					for(var i = 0; i < length; i += 1){
-						if(data["data"][i]["last_activity_id"] !== null){
-							lastActivity = true;
-							ids.push(data["data"][i]["id"]);
-						}
+			function downloadRegs(data, oldTarget){
+				var target = (oldTarget == "activityFields" ) ? "activities" : (oldTarget == "dealFields") ? "deals" : (oldTarget == "noteFields") ? "notes" : (oldTarget == "organizationFields") ? "organizations" : (oldTarget == "personFields") ? "persons" : (oldTarget == "productFields") ? "products" : "none";
+				if(target != "none"){
+					/*
+					var fields = ":(";
+					var length = data["data"].length;
+					for(var i = 1; i <= length; i += 1){
+						fields += (i == length) ? data["data"][i - 1] + ")" : data["data"][i - 1] + ",";
 					}
-					lastActivity ? getLastActivity(ids) : alert("There is no deal with last activity");
-				} else {
-					alert("There is no data in server response");
-				}
-			}
-            function getLastActivity(ids){
-				var fields = "expected_close_date,86c36896097d77ad77dbb52337a13f9799c72c16,1a0f93c059a93450fdb4b8d0bb26613fe0d6460,products_count,org_id,deal_title,last_activity,6b7027058f7b5ec5c9f6fd822a34a86adb8cc726";
-				for(i = 1; i <= ids.length; i += 1){
-					url = "https://api.pipedrive.com/v1/deals:(" + fields + ")/" + ids[i-1] + "?api_token=" + token;
+					*/
+					var start = 0;
+					var limit = 500;
+					url = "https://api.pipedrive.com/v1/" + target + "?api_token=" + token + "&start=" + start + "&limit=" + limit;
 					$.ajax({url: url,
-							dataType: 'json',
-							async: false,
+							dataType: "json",
+							error: function(err){
+								showAlert("<strong>" + err.status + ": " + err.statusText + "</strong>", "danger");
+							},
 							success: function(data){
-								console.log(i + "/" + ids.length);
-								i == ids.length ? addRow(data, true) : addRow(data, false);
+								showAlert("<strong>Wait a second, downloading the data...</strong>", "info");
+								addRowInFile(data, target);
 							}
 					});
 				}
 			}
-			function addRow(data, now){
-					var rec = data["data"];
-					var row = [rec["expected_close_date"]];
-					row.push(rec["86c36896097d77ad77dbb52337a13f9799c72c16"]);
-					row.push(rec["1a0f93c059a93450fdb4b8d0bb26613fe0d6460f"]);
-					row.push(rec["products_count"]);
-					row.push(rec["org_id"]["name"]);
-					row.push(rec["deal_title"]);
-					row.push(rec["last_activity"]["type"]);
-					row.push(rec["last_activity"]["add_time"]);
-					row.push(rec["last_activity"]["done"]);
-					row.push(rec["last_activity"]["marked_as_done_time"]);
-					row.push(rec["6b7027058f7b5ec5c9f6fd822a34a86adb8cc726"]);
-					row.push(rec["last_activity"]["note"]);
-					console.log(row);
-					for(var i = 1; i <= row.length; i += 1){
-						csv += (i == row.length) ? row[i-1] + "\r\n" : row[i-1] + ",";
-					}
-					if(now){
-						downNow = true;
-					}
-			}
-			if(downNow){
-				var encodedURI = encodeURI(csv);
-				var link = document.createElement("a");
-				link.setAttribute("href", encodedURI);
-				link.setAttribute("download", new Date().toISOString() + ".csv");
-				document.body.appendChild(link);
-				link.click();
-				document.body.removeChild(link);
-			}
+
+
 		});	
 	</script>
 </body>
