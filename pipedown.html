@@ -161,13 +161,7 @@
 			$("#" + id).show();
 		}
 		$(".alert").click(function(){
-			if(this.id == "info"){
-				$('#info').toggle();
-			} else if(this.id == "warning"){
-				$('#warning').toggle();
-			} else if(this.id == "danger"){
-				$('#danger').toggle();
-			}
+			$("#" + this.id).toggle();
 		});
 	</script>
 </body>
