@@ -50,9 +50,9 @@
 				</div>
 			</div>
 			<div class="col-md-12">
-				<div class="alert alert-info" id="info" hidden="hidden" onclick="$('#info').toggle()"></div>
-				<div class="alert alert-warning" id="warning" hidden="hidden"onclick="$('#warning').toggle()"></div>
-				<div class="alert alert-danger" id="danger" hidden="hidden" onclick="$('#danger').toggle()"></div>
+				<div class="alert alert-info" id="info" hidden="hidden"></div>
+				<div class="alert alert-warning" id="warning" hidden="hidden"></div>
+				<div class="alert alert-danger" id="danger" hidden="hidden"></div>
 				<div id="accordion">
 					<h3>Activities</h3>
 					<div class="form-group">
@@ -120,7 +120,7 @@
 								showAlert("<strong>" + err.status + ": " + err.statusText + "</strong>", "danger");
 							},
 							success: function(data){
-								showAlert("<strong>Wait a second, downloading the data...</strong>", "info");
+								showAlert("<strong>One more second...</strong>", "info");
 								addRowInFile(data, target);
 							}
 					});
@@ -158,6 +158,15 @@
 			document.getElementById(id).innerHTML = message;
 			$("#" + id).show();
 		}
+		$(".alert").click(function(){
+			if(this.id == "info"){
+				$('#info').toggle();
+			} else if(this.id == "warning"){
+				$('#warning').toggle();
+			} else if(this.id == "danger"){
+				$('#danger').toggle();
+			}
+		});
 	</script>
 </body>
 </html>
