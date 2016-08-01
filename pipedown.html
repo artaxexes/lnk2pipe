@@ -144,8 +144,15 @@
 					showAlert("<strong>The length of the server response data is 0. This is weird</strong>", "warning");
 				}
 			}
-
-
+			function downFile(file, target){
+				var encodedURI = encodeURI(file);
+				var link = document.createElement("a");
+				link.setAttribute("href", encodedURI);
+				link.setAttribute("download", target + "_" + new Date().toISOString() + ".csv");
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+			}
 		});	
 	</script>
 </body>
