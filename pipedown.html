@@ -126,6 +126,24 @@
 					});
 				}
 			}
+			function addRowInFile(data, target){
+				if(data["data"].length > 0){
+					var props = [];
+					for(var prop in data["data"][0]){
+						props.push(prop);
+					}
+					var csv = "data:text/csv;charset=utf-8,";
+					csv += props.join(",") + "\r\n";
+					for(var i = 1; i <= data["data"].length; i += 1){
+						for(var j = 1; j <= props.length; j += 1){
+							csv += (j == props.length) ? data["data"][i-1][props[j-1]] + "\r\n" : data["data"][i-1][props[j-1]] + ",";
+						}
+					}
+					downFile(csv, target);
+				} else {
+					showAlert("<strong>The length of the server response data is 0. This is weird</strong>", "warning");
+				}
+			}
 
 
 		});	
