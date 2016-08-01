@@ -135,12 +135,12 @@
 					for(var i = 1; i <= data["data"].length; i += 1){
 						for(var j = 1; j <= props.length; j += 1){
 							var tmp = data["data"][i-1][props[j-1]];
-							//var field = "";
 							if(typeof tmp == "string"){
 								tmp = "\"" + tmp.replace(/\"/g, "\\\"") + "\"";
+							} else if(typeof tmp == "object" && tmp != null && tmp != undefined){
+								tmp = Object.keys(tmp).map(k => tmp[k]);
 							}
 							csv += (j == props.length) ? tmp + "\r\n" : tmp + ",";
-							//csv += (j == props.length) ? data["data"][i-1][props[j-1]] + "\r\n" : data["data"][i-1][props[j-1]] + ",";
 						}
 					}
 					downFile(csv, target);
