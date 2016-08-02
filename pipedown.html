@@ -138,7 +138,12 @@
 							if(typeof tmp == "string"){
 								tmp = "\"" + tmp.replace(/\"/g, "\\\"") + "\"";
 							} else if(typeof tmp == "object" && tmp != null && tmp != undefined){
-								tmp = Object.keys(tmp).map(k => tmp[k]);
+								// get org_id value
+								if(target == "deals" && tmp.hasOwnProperty("people_count")){
+									tmp = tmp["value"];
+								} else {
+									tmp = "objeto";
+								}
 							}
 							csv += (j == props.length) ? tmp + "\r\n" : tmp + ",";
 						}
