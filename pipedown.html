@@ -170,6 +170,51 @@
 		$(".alert").click(function(){
 			$("#" + this.id).toggle();
 		});
+		function dealsProducts(){
+			var url = "api.pipedrive.com/v1/deals/203/products?start=0&include_product_data=1&api_token=";
+		}
+		function mapDeal(){
+			/*
+			0c32aa4691a5a7b46ad99cfcbafc38bd51c9bc4e / Essa conta é uma potencial partícipe de uma ATA (conferido, nenhum valor)
+				null
+			6b7027058f7b5ec5c9f6fd822a34a86adb8cc726 / Evento Proposto (conferido, faltam 8)
+				91: "Entrevista com as pessoas-chave"
+				92: "Pesquisar o sistema atual / Recolher informações para SIB"
+				93: "Demonstrar as funcionalidades aos membros do comitê (SIB)"
+				94: "Desenvolver o plano de implementação"
+				95: "Compartilhar os resultados da pesquisa e apresentar uma estimativa de custos"
+				96: "Promover a análise de custo/benefício (ROI/TCO)"
+				* 97: "Apresentar os contratos para uma revisão legal"
+				* 98: "Definir a métrica de sucesso"
+				* 99: "Obter a aprovação legal dos contratos"
+				* 100: "Compartilhar as informações de referência"
+				* 101: "Conduzir revisão de pre-decisão"
+				102: "Entregar proposta para aprovação"
+				* 103: "Iniciar a implementação"
+				104: "Tarefa Cliente"
+				* 105: "Tarefa parceiro"
+				* 106: "Outros"
+			1a0f93c059a93450fdb4b8d0bb26613fe0d6460f / Status (conferido, tudo ok)
+				107: "Goal Identified"
+				* 108: "Goal Confirmed"
+				109: "Champion"
+				110: "Prove Value"
+				111: "Negotiation"
+				117: "Lead"
+			86c36896097d77ad77dbb52337a13f9799c72c16 / Competidor
+				118: "Tableau"
+				119: "Microsoft"
+				* 120: "SAS"
+				121: "SAP"
+				122: "IBM"
+				* 123: "Tibco Software"
+				124: "Oracle"
+				125: "MicroStrategy"
+				* 126: "Target"
+				127: "Pentaho"
+				128: "GoodData"
+			*/
+		}
 	</script>
 </body>
 </html>
