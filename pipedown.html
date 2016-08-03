@@ -85,75 +85,109 @@
 		</div>
 	</div>
 	<script>
+
 		$("button").click(function(event){
+
 			var token = document.getElementById("token").value;
-			var target = event.target.id;
+			var btn = event.target.id;
 			var url = "https://api.pipedrive.com/v1/" + target + "?api_token=" + token;
+
 			$.ajax({url: url,
 					dataType: "json",
-					error: function(err){
-						showAlert("<strong>" + err.status + ": " + err.statusText + "</strong>", "danger");
-					},
+					error: err_handler(err),
 					success: function(data){
-						showAlert("<strong>Wait a second, downloading the data...</strong>", "info");
-						downloadRegs(data, target);
+						show_alert("<strong>Wait a second, downloading the data...</strong>", "info");
+						down_regs(data, btn);
 					}
 			});
-			function downloadRegs(data, oldTarget){
-				var target = (oldTarget == "activityFields" ) ? "activities" : (oldTarget == "dealFields") ? "deals" : (oldTarget == "noteFields") ? "notes" : (oldTarget == "organizationFields") ? "organizations" : (oldTarget == "personFields") ? "persons" : (oldTarget == "productFields") ? "products" : "none";
-				if(target != "none"){
-					/*
-					var fields = ":(";
-					var length = data["data"].length;
-					for(var i = 1; i <= length; i += 1){
-						fields += (i == length) ? data["data"][i - 1] + ")" : data["data"][i - 1] + ",";
+
+
+			function down_regs(data, btn){
+
+				var target = function(opt){
+					switch(opt){
+						case "activityFields":
+							return "activities";
+						case "dealFields":
+							return "deals";
+						case "noteFields":
+							return "notes";
+						case "organizationFields":
+							return "organizations";
+						case "personFields":
+							return "persons";
+						case "productFields":
+							return "products";
+						default:
+							return "none";
 					}
-					*/
-					var start = 0;
-					var limit = 500;
-					url = "https://api.pipedrive.com/v1/" + target + "?api_token=" + token + "&start=" + start + "&limit=" + limit;
-					$.ajax({url: url,
-							dataType: "json",
-							error: function(err){
-								showAlert("<strong>" + err.status + ": " + err.statusText + "</strong>", "danger");
-							},
-							success: function(data){
-								showAlert("<strong>One more second...</strong>", "info");
-								addRowInFile(data, target);
-							}
-					});
+				};
+				var start = 0;
+				var limit = 500;
+
+				if(target(btn) === "none"){
+					show_alert("<strong>Wonknown button</strong>", "warning");
+					return;
 				}
-			}
-			function addRowInFile(data, target){
-				if(data["data"].length > 0){
-					var props = [];
-					for(var prop in data["data"][0]){
-						props.push(prop);
-					}
-					var csv = "data:text/csv;charset=utf-8,";
-					csv += props.join(",") + "\r\n";
-					for(var i = 1; i <= data["data"].length; i += 1){
-						for(var j = 1; j <= props.length; j += 1){
-							var tmp = data["data"][i-1][props[j-1]];
-							if(typeof tmp == "string"){
-								tmp = "\"" + tmp.replace(/\"/g, "\\\"") + "\"";
-							} else if(typeof tmp == "object" && tmp != null && tmp != undefined){
-								// get org_id value
-								if(target == "deals" && tmp.hasOwnProperty("people_count")){
-									tmp = tmp["value"];
-								} else {
-									tmp = "objeto";
-								}
-							}
-							csv += (j == props.length) ? tmp + "\r\n" : tmp + ",";
+
+				url = "https://api.pipedrive.com/v1/" + target(btn) + "?api_token=" + token + "&start=" + start + "&limit=" + limit;
+
+				$.ajax({url: url,
+						dataType: "json",
+						error: err_handler(err),
+						success: function(data){
+							show_alert("<strong>One more second...</strong>", "info");
+							add_row(data, target(btn));
 						}
-					}
-					downFile(csv, target);
-				} else {
-					showAlert("<strong>The length of the server response data is 0. This is weird</strong>", "warning");
-				}
+				});
 			}
-			function downFile(file, target){
+			
+			function add_row(data, target){
+				
+				var length = data.data.length;
+
+				if(length <= 0){
+					showAlert("<strong>The length of the server response data is 0. This is weird</strong>", "warning");
+					return;
+				}
+
+				var dataset = data.data;
+				var headers = Object.keys(dataset).join(",");
+				var data, field;
+				var csv = "data:text/csv;charset=utf-8," + headers + "\r\n";
+				
+				/*
+				for(var header in dataset[0]){
+					headers.push(header);
+				}
+				csv += props.join(",") + "\r\n";
+				*/
+				for(var i = 1; i <= length; i += 1){
+					for(var j = 1; j <= headers.length; j += 1){
+						var tmp = dataset[i-1][headers[j-1]];
+						/*
+						if(target === "deals" && (data["data"][i-1].hasOwnProperty("6b7027058f7b5ec5c9f6fd822a34a86adb8cc726") || data["data"][i-1].hasOwnProperty("1a0f93c059a93450fdb4b8d0bb26613fe0d6460f") || data["data"][i-1].hasOwnProperty("86c36896097d77ad77dbb52337a13f9799c72c16"))){
+						tmp = mapDeal(tmp);
+						} else
+						*/
+						if(typeof tmp === "string"){
+							tmp = "\"" + tmp.replace(/\"/g, "\\\"") + "\"";
+						} else if(typeof tmp === "object" && tmp !== null && tmp !== undefined){
+							// get org_id value
+							if(target === "deals" && tmp.hasOwnProperty("people_count")){
+								tmp = tmp["value"];
+							} else {
+								tmp = "objeto";
+							}
+						}
+						csv += (j == props.length) ? tmp + "\r\n" : tmp + ",";
+					}
+				}
+				down_file(csv, target);
+			}
+
+			function down_file(file, target){
+
 				var encodedURI = encodeURI(file);
 				var link = document.createElement("a");
 				link.setAttribute("href", encodedURI);
@@ -161,60 +195,118 @@
 				document.body.appendChild(link);
 				link.click();
 				document.body.removeChild(link);
+
 			}
 		});
-		function showAlert(message, id){
-			document.getElementById(id).innerHTML = message;
-			$("#" + id).show();
-		}
-		$(".alert").click(function(){
-			$("#" + this.id).toggle();
-		});
+
 		function dealsProducts(){
 			var url = "api.pipedrive.com/v1/deals/203/products?start=0&include_product_data=1&api_token=";
 		}
-		function mapDeal(){
-			/*
-			0c32aa4691a5a7b46ad99cfcbafc38bd51c9bc4e / Essa conta é uma potencial partícipe de uma ATA (conferido, nenhum valor)
-				null
-			6b7027058f7b5ec5c9f6fd822a34a86adb8cc726 / Evento Proposto (conferido, faltam 8)
-				91: "Entrevista com as pessoas-chave"
-				92: "Pesquisar o sistema atual / Recolher informações para SIB"
-				93: "Demonstrar as funcionalidades aos membros do comitê (SIB)"
-				94: "Desenvolver o plano de implementação"
-				95: "Compartilhar os resultados da pesquisa e apresentar uma estimativa de custos"
-				96: "Promover a análise de custo/benefício (ROI/TCO)"
-				* 97: "Apresentar os contratos para uma revisão legal"
-				* 98: "Definir a métrica de sucesso"
-				* 99: "Obter a aprovação legal dos contratos"
-				* 100: "Compartilhar as informações de referência"
-				* 101: "Conduzir revisão de pre-decisão"
-				102: "Entregar proposta para aprovação"
-				* 103: "Iniciar a implementação"
-				104: "Tarefa Cliente"
-				* 105: "Tarefa parceiro"
-				* 106: "Outros"
-			1a0f93c059a93450fdb4b8d0bb26613fe0d6460f / Status (conferido, tudo ok)
-				107: "Goal Identified"
-				* 108: "Goal Confirmed"
-				109: "Champion"
-				110: "Prove Value"
-				111: "Negotiation"
-				117: "Lead"
-			86c36896097d77ad77dbb52337a13f9799c72c16 / Competidor
-				118: "Tableau"
-				119: "Microsoft"
-				* 120: "SAS"
-				121: "SAP"
-				122: "IBM"
-				* 123: "Tibco Software"
-				124: "Oracle"
-				125: "MicroStrategy"
-				* 126: "Target"
-				127: "Pentaho"
-				128: "GoodData"
-			*/
+
+		function mapDeal(field){
+			// Evento proposto
+			if(field["6b7027058f7b5ec5c9f6fd822a34a86adb8cc726"] != ""){
+				var value = field["6b7027058f7b5ec5c9f6fd822a34a86adb8cc726"];
+				switch(value){
+					case "91":
+						return "Entrevista com as pessoas-chave";
+					case "92":
+						return "Pesquisar o sistema atual / Recolher informações para SIB";
+					case "93":
+						return "Demonstrar as funcionalidades aos membros do comitê (SIB)";
+					case "94":
+						return "Desenvolver o plano de implementação";
+					case "95":
+						return "Compartilhar os resultados da pesquisa e apresentar uma estimativa de custos";
+					case "96":
+						return "Promover a análise de custo/benefício (ROI/TCO)";
+					case "97":
+						return "Apresentar os contratos para uma revisão legal";
+					case "98":
+						return "Definir a métrica de sucesso";
+					case "99":
+						return "Obter a aprovação legal dos contratos";
+					case "100":
+						return "Compartilhar as informações de referência";
+					case "101":
+						return "Conduzir revisão de pre-decisão";
+					case "102":
+						return "Entregar proposta para aprovação";
+					case "103":
+						return "Iniciar a implementação";
+					case "104":
+						return "Tarefa Cliente";
+					case "105":
+						return "Tarefa parceiro";
+					case "106":
+						return "Outros";
+					default:
+						return "null";
+				}
+			}
+			// Status
+			else if(field == "1a0f93c059a93450fdb4b8d0bb26613fe0d6460f"){
+				switch(field){
+					case "107":
+						return "Goal Identified";
+					case "108":
+						return "Goal Confirmed";
+					case "109":
+						return "Champion";
+					case "110":
+						return "Prove Value";
+					case "111":
+						return "Negotiation";
+					case "117":
+						return "Lead";
+					default:
+						return "null";
+				}
+			}
+			// Competidor
+			else if(field == "86c36896097d77ad77dbb52337a13f9799c72c16"){
+				switch(field){
+					case "118":
+						return "Tableau";
+					case "119":
+						return "Microsoft";
+					case "120":
+						return "SAS";
+					case "121":
+						return "SAP";
+					case "122":
+						return "IBM";
+					case "123":
+						return "Tibco Software";
+					case "124":
+						return "Oracle";
+					case "125":
+						return "MicroStrategy";
+					case "126":
+						return "Target";
+					case "127":
+						return "Pentaho";
+					case "128":
+						return "GoodData";
+					default:
+						"null";
+				}
+			}
 		}
+
+		function show_alert(message, id){
+			document.getElementById(id).innerHTML = message;
+			$("#" + id).show();
+		}
+
+		function err_handler(err){
+			show_alert("<strong>" + err.status + ": " + err.statusText + "</strong>", "danger");
+		}
+
+		$(".alert").click(function(){
+			$("#" + this.id).toggle();
+		});
+
 	</script>
 </body>
 </html>
